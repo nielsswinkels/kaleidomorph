@@ -61,12 +61,16 @@ void draw() {
     //pic = loadImage(video.read());
     image(pic, 20,20, 100,100);
     PImage imgNose = loadImage("img/nose/lappstiftet.png");
-    image(imgNose, 60, 50, 25,35);
+    image(imgNose, 55, 30, 35,55);
     PImage imgHat = loadImage("img/hat/kuggen.png");
-    image(imgHat, 30, 0, 80,40);
+    image(imgHat, 10, -10, 120,60);
     
     PImage imgEarLeft = loadImage("img/ear/fiskekyrkan.png");
-    image(imgEarLeft, 0, 20, 80,40);
+    image(imgEarLeft, -10, 35, 50,40);
+    
+    PImage imgEarRight = loadImage("img/ear/fiskekyrkan2.png");
+    image(imgEarRight, 90, 35, 50,40);
+    
     
     println("displaying face");
     //pause();
