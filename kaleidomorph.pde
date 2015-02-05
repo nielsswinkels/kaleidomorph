@@ -122,7 +122,7 @@ void displayFace()
   int faceX = 100;
   int faceY = 100;
   
-  
+  scale(2);
   Rectangle f =  faces[faces.length-1];
   PGraphics pic = createGraphics(f.width,f.height);
   pic.beginDraw();
@@ -143,7 +143,7 @@ void displayFace()
   
   image(imgEarRight, faceX+70, faceY+15, 50,40);
   
-  
+  scale(1);
   if (millis() - startTime > APPROVE_DELAY)
   {
     println("Saving picture");
