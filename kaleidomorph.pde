@@ -131,16 +131,9 @@ void displayFace()
   //pic = loadImage(video.read());
   image(pic, faceX,faceY, 100,100);
   
-  
-  
   image(imgNose, faceX+35, faceY+10, 35,55);
-  
   image(imgHat, faceX-10, faceY-30, 120,60);
-  
-  
   image(imgEarLeft, faceX-20, faceY+15, 50,40);
-  
-  
   image(imgEarRight, faceX+70, faceY+15, 50,40);
   
   scale(1);
