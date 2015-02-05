@@ -27,7 +27,10 @@ String[] noseFiles;
 String[] earFiles;
 String[] hatFiles;
 
-
+PImage imgNose;
+PImage imgEarLeft;
+PImage imgEarRight;
+PImage imgHat;
 
 void setup() {
   size(640, 480);
@@ -42,9 +45,9 @@ void setup() {
   
   textFont(createFont("Georgia", 36));
   
-  noseFiles = listFileNames("img/nose");
-  earFiles = listFileNames("img/ear");
-  hatFiles = listFileNames("img/hat");
+  noseFiles = listFileNames(sketchPath+"/img/nose");
+  earFiles = listFileNames(sketchPath+"/img/ear");
+  hatFiles = listFileNames(sketchPath+"/img/hat");
 }
 
 int prevAmountFaces = 0;
@@ -93,6 +96,11 @@ void draw() {
   {
     mode = 2;
     startTime = millis();
+    
+    imgNose = loadRandom("nose", noseFiles);
+    imgHat = loadRandom("hat", hatFiles);
+    imgEarLeft = loadRandom("ear", earFiles);
+    imgEarRight = loadRandom("ear", earFiles);
   }
   
   if(mode == 2)
@@ -124,15 +132,15 @@ void displayFace()
   image(pic, faceX,faceY, 100,100);
   
   
-  PImage imgNose = loadRandomNose();
+  
   image(imgNose, faceX+35, faceY+10, 35,55);
-  PImage imgHat = loadImage("img/hat/kuggen.png");
+  
   image(imgHat, faceX-10, faceY-30, 120,60);
   
-  PImage imgEarLeft = loadImage("img/ear/fiskekyrkan.png");
+  
   image(imgEarLeft, faceX-20, faceY+15, 50,40);
   
-  PImage imgEarRight = loadImage("img/ear/fiskekyrkan2.png");
+  
   image(imgEarRight, faceX+70, faceY+15, 50,40);
   
   
@@ -180,14 +188,16 @@ String[] listFileNames(String dir) {
   File file = new File(dir);
   if (file.isDirectory()) {
     String names[] = file.list();
+    println("found "+names.length+" files");
     return names;
   } else {
     // If it's not a directory
+    println("Warning: this is not a directory:"+dir);
     return null;
   }
 }
 
-PImage loadRandomNose()
+PImage loadRandom(String dir, String[] files)
 {
-  return loadImage("img/nose/"+noseFiles[int(random(noseFiles.length))]);
+  return loadImage("img/"+dir+"/"+files[int(random(files.length))]);
 }
