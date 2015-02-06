@@ -62,6 +62,7 @@ void draw() {
   if (mode == 0)
   {
     fill(0);
+    textSize(52);
     text("Titta hit!", width/2.0, height/2.0);
     pause();
   }
@@ -146,7 +147,10 @@ void displayFace()
   }
   else
   {
-    println("saving picture in " + (APPROVE_DELAY - millis() - startTime)/1000 + " seconds");
+    int seconds = round((APPROVE_DELAY - (millis() - startTime))/1000);
+    println("Saving picture in " + seconds + " seconds");
+    textSize(18);
+    text("Sparar bilden i " + seconds + " sekunder.", 10, 30);
   }
 }
 
