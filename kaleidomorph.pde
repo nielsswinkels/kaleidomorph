@@ -28,12 +28,12 @@ String[] earFiles;
 String[] hatFiles;
 
 PImage imgNose;
-PImage imgEarLeft;
-PImage imgEarRight;
+PImage imgEar;
 PImage imgHat;
 
 void setup() {
   size(640, 480);
+  frame.setResizable(true);
   //size(1024, 768);
   video = new Capture(this, VIDEO_RES_WIDTH, VIDEO_RES_HEIGHT);
   opencv = new OpenCV(this, VIDEO_RES_WIDTH, VIDEO_RES_HEIGHT);
@@ -53,7 +53,7 @@ void setup() {
 int prevAmountFaces = 0;
 
 void draw() {
-  println("mode="+mode);
+  
   
   // fill the screen with white
   background(255);
@@ -84,24 +84,27 @@ void draw() {
     {
       startTime = millis();
       mode = 1;
+      println("mode="+mode);
     }
   }
   else
   {
     // no faces detected
     //startTime = millis();
-   mode = 0; 
+   mode = 0;
+   println("mode="+mode);
   }
   
   if(mode == 1 && millis() - startTime > START_DELAY)
   {
     mode = 2;
+    println("mode="+mode);
+    
     startTime = millis();
     
     imgNose = loadRandom("nose", noseFiles);
     imgHat = loadRandom("hat", hatFiles);
-    imgEarLeft = loadRandom("ear", earFiles);
-    imgEarRight = loadRandom("ear", earFiles);
+    imgEar = loadRandom("ear", earFiles);
   }
   
   if(mode == 2)
@@ -112,32 +115,34 @@ void draw() {
   
   
   prevAmountFaces = faces.length;
-  println("framerate:"+frameRate);
+  //println("framerate:"+frameRate);
 }
 
 void displayFace()
 {
-  println("displaying face");
-  
   // parameters for the location of the morphed face
-  int faceX = 100;
-  int faceY = 100;
+  int faceSize = 200;
+  int faceX = int(width/2.0-faceSize/2.0);
+  int faceY = int(height/2.0-faceSize/2.0);
   
-  scale(2);
   Rectangle f =  faces[faces.length-1];
   PGraphics pic = createGraphics(f.width,f.height);
   pic.beginDraw();
   pic.image(video, -f.x, -f.y);
   pic.endDraw();
   //pic = loadImage(video.read());
-  image(pic, faceX,faceY, 100,100);
+  image(pic, faceX,faceY, faceSize,faceSize);
   
-  image(imgNose, faceX+35, faceY+10, 35,55);
-  image(imgHat, faceX-10, faceY-30, 120,60);
-  image(imgEarLeft, faceX-20, faceY+15, 50,40);
-  image(imgEarRight, faceX+70, faceY+15, 50,40);
+  int buildingsX = int(faceX - (faceSize/2.094240837696335));
+  int buildingsY = int(faceY - (faceSize/2.083333333333333));
+  int buildingsWidth = int(faceSize * 1.955);
+  int buildingsHeight = int(faceSize * 1.6525);
   
-  scale(1);
+  
+  image(imgNose, buildingsX, buildingsY, buildingsWidth, buildingsHeight);
+  image(imgHat, buildingsX, buildingsY, buildingsWidth, buildingsHeight);
+  image(imgEar, buildingsX, buildingsY, buildingsWidth, buildingsHeight);
+  
   if (millis() - startTime > APPROVE_DELAY)
   {
     println("Saving picture");
@@ -148,7 +153,7 @@ void displayFace()
   else
   {
     int seconds = round((APPROVE_DELAY - (millis() - startTime))/1000);
-    println("Saving picture in " + seconds + " seconds");
+    //println("Saving picture in " + seconds + " seconds");
     textSize(18);
     text("Sparar bilden i " + seconds + " sekunder.", 10, 30);
   }
