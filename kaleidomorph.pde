@@ -26,10 +26,12 @@ int VIDEO_RES_HEIGHT = 360;
 String[] noseFiles;
 String[] earFiles;
 String[] hatFiles;
+String[] mouthFiles;
 
 PImage imgNose;
 PImage imgEar;
 PImage imgHat;
+PImage imgMouth;
 PImage faceMask;
 
 void setup() {
@@ -49,6 +51,7 @@ void setup() {
   noseFiles = listFileNames(sketchPath+"/img/nose");
   earFiles = listFileNames(sketchPath+"/img/ear");
   hatFiles = listFileNames(sketchPath+"/img/hat");
+  mouthFiles = listFileNames(sketchPath+"/img/mouth");
   
   faceMask = loadImage(sketchPath+"/img/facemask.png");
 }
@@ -108,6 +111,7 @@ void draw() {
     imgNose = loadRandom("nose", noseFiles);
     imgHat = loadRandom("hat", hatFiles);
     imgEar = loadRandom("ear", earFiles);
+    imgMouth = loadRandom("mouth", mouthFiles);
   }
   
   if(mode == 2)
@@ -147,6 +151,7 @@ void displayFace()
   image(imgNose, buildingsX, buildingsY, buildingsWidth, buildingsHeight);
   image(imgHat, buildingsX, buildingsY, buildingsWidth, buildingsHeight);
   image(imgEar, buildingsX, buildingsY, buildingsWidth, buildingsHeight);
+  image(imgMouth, buildingsX, buildingsY, buildingsWidth, buildingsHeight);
   
   if (millis() - startTime > APPROVE_DELAY)
   {
