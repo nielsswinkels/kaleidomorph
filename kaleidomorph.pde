@@ -6,7 +6,7 @@ OpenCV opencv;
 Capture video;
 Rectangle[] faces;
 
-int START_DELAY = 800; // delay before creating a new morph
+int START_DELAY = 0; // delay before creating a new morph
 int APPROVE_DELAY = 10000; // delay before the picture is saved
 int startTime;
 int mode = 0; // 0 = idle, 1 = face found, 2 = saving picture
@@ -30,6 +30,7 @@ String[] hatFiles;
 PImage imgNose;
 PImage imgEar;
 PImage imgHat;
+PImage faceMask;
 
 void setup() {
   size(640, 480);
@@ -48,6 +49,8 @@ void setup() {
   noseFiles = listFileNames(sketchPath+"/img/nose");
   earFiles = listFileNames(sketchPath+"/img/ear");
   hatFiles = listFileNames(sketchPath+"/img/hat");
+  
+  faceMask = loadImage(sketchPath+"/img/facemask.png");
 }
 
 int prevAmountFaces = 0;
@@ -131,7 +134,9 @@ void displayFace()
   pic.image(video, -f.x, -f.y);
   pic.endDraw();
   //pic = loadImage(video.read());
+  
   image(pic, faceX,faceY, faceSize,faceSize);
+  image(faceMask, faceX,faceY, faceSize,faceSize);
   
   int buildingsX = int(faceX - (faceSize/2.094240837696335));
   int buildingsY = int(faceY - (faceSize/2.083333333333333));
