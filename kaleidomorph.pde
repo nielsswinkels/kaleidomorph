@@ -75,9 +75,8 @@ int prevAmountFaces = 0;
 
 
 void draw() {
-  
-	// this should only be done once at the start, and when the screen resizes
-	calculateLocations();
+  int faceX = int(width/2.0-faceSize/2.0);
+  int faceY = int(height/4.0-faceSize/2.0);
   
   // fill the screen with white
   background(255);
@@ -242,8 +241,3 @@ PImage loadRandom(String dir, String[] files)
   return loadImage("img/"+dir+"/"+files[int(random(files.length))]);
 }
 
-void calculateLocations()
-{
-	int faceX = int(width/2.0-faceSize/2.0);
-	int faceY = int(height/4.0-faceSize/2.0);
-}
