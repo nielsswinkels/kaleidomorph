@@ -8,6 +8,7 @@ Rectangle[] faces;
 
 int START_DELAY = 0; // delay before creating a new morph
 int APPROVE_DELAY = 10000; // delay before the picture is saved
+int SHOW_MORPH_DELAY = 1000; // how long to display the final saved morph
 int startTime;
 int mode = 0; // 0 = idle, 1 = face found, 2 = saving picture
 
@@ -163,6 +164,7 @@ void displayFace()
     // save the picture as a file
     saveFrame("output/urbanum####.png");
     mode = 0;
+    
   }
   else
   {
