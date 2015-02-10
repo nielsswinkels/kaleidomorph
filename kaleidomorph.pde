@@ -11,6 +11,8 @@ int APPROVE_DELAY = 10000; // delay before the picture is saved
 int startTime;
 int mode = 0; // 0 = idle, 1 = face found, 2 = saving picture
 
+String[] hejString = {"Titta hit!", "Kolla här..", "Tjenare!", "Vem där?"};
+
 // just some supported resolutions for the logitech webcam c930e:
 // 640x360
 // 800x600
@@ -20,8 +22,8 @@ int mode = 0; // 0 = idle, 1 = face found, 2 = saving picture
 // 1600x896
 // 1920x1080
 // 2304x1536 (max res)
-int VIDEO_RES_WIDTH = 640; // max = 2304x1536 (logitech 1080p)
-int VIDEO_RES_HEIGHT = 360;
+int VIDEO_RES_WIDTH = 960; // max = 2304x1536 (logitech 1080p)
+int VIDEO_RES_HEIGHT = 540;
 
 String[] noseFiles;
 String[] earFiles;
@@ -42,7 +44,7 @@ void setup() {
   opencv = new OpenCV(this, VIDEO_RES_WIDTH, VIDEO_RES_HEIGHT);
   opencv.loadCascade(OpenCV.CASCADE_FRONTALFACE);  
   
-  video.start();
+ 
   startTime = millis();
   mode = 0;
   
@@ -54,6 +56,8 @@ void setup() {
   mouthFiles = listFileNames(sketchPath+"/img/mouth");
   
   faceMask = loadImage(sketchPath+"/img/facemask.png");
+  
+  video.start();
 }
 
 int prevAmountFaces = 0;
@@ -69,7 +73,7 @@ void draw() {
   {
     fill(0);
     textSize(52);
-    text("Titta hit!", width/2.0, height/2.0);
+    text(hejString[int(random(hejString.length-1))], random(width/4.0, width/2.0), random(height/5.0, height/2.0));
     pause();
   }
   
@@ -81,7 +85,7 @@ void draw() {
   faces = opencv.detect();
   
   // draw a green recangle on all detected faces
-  rectangleAroundFaces();
+  //rectangleAroundFaces();
 
   if(faces.length > 0)
   {
@@ -128,9 +132,9 @@ void draw() {
 void displayFace()
 {
   // parameters for the location of the morphed face
-  int faceSize = 200;
+  int faceSize = 600;
   int faceX = int(width/2.0-faceSize/2.0);
-  int faceY = int(height/2.0-faceSize/2.0);
+  int faceY = int(height/4.0-faceSize/2.0);
   
   Rectangle f =  faces[faces.length-1];
   PGraphics pic = createGraphics(f.width,f.height);
@@ -165,7 +169,7 @@ void displayFace()
     int seconds = round((APPROVE_DELAY - (millis() - startTime))/1000);
     //println("Saving picture in " + seconds + " seconds");
     textSize(18);
-    text("Sparar bilden i " + seconds + " sekunder.", 10, 30);
+    text("Sparar bilden om " + seconds + " sekunder.", 10, 30);
   }
 }
 
