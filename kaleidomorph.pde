@@ -10,7 +10,12 @@ int START_DELAY = 0; // delay before creating a new morph
 int APPROVE_DELAY = 10000; // delay before the picture is saved
 int SHOW_MORPH_DELAY = 1000; // how long to display the final saved morph
 int startTime;
-int mode = 0; // 0 = idle, 1 = face found, 2 = saving picture
+int mode = 0; // 0 = idle, 1 = face found, 2 = saving picture, 3 = display the saved picture for a while
+
+// parameters for the location of the morphed face
+int faceSize = 600;
+int faceX = 0;
+int faceY = 0;
 
 String[] hejString = {"Titta hit!", "Kolla här..", "Tjenare!", "Vem där?"};
 
@@ -36,6 +41,8 @@ PImage imgEar;
 PImage imgHat;
 PImage imgMouth;
 PImage faceMask;
+
+String lastMorphFile = "";
 
 void setup() {
   size(640, 480);
@@ -63,8 +70,11 @@ void setup() {
 
 int prevAmountFaces = 0;
 
+
 void draw() {
   
+	// this should only be done once at the start, and when the screen resizes
+	calculateLocations();
   
   // fill the screen with white
   background(255);
@@ -123,6 +133,19 @@ void draw() {
   {
     displayFace();
   }
+  
+  if(mode == 3)
+  {
+    if(millis() - startTime < SHOW_MORPH_DELAY)
+    {
+      image(loadImage(lastMorphFile), 0, 0, width, height);
+    }
+    else
+    {
+      mode = 0;
+    }
+	
+  }
 
   
   
@@ -132,11 +155,6 @@ void draw() {
 
 void displayFace()
 {
-  // parameters for the location of the morphed face
-  int faceSize = 600;
-  int faceX = int(width/2.0-faceSize/2.0);
-  int faceY = int(height/4.0-faceSize/2.0);
-  
   Rectangle f =  faces[faces.length-1];
   PGraphics pic = createGraphics(f.width,f.height);
   pic.beginDraw();
@@ -162,9 +180,10 @@ void displayFace()
   {
     println("Saving picture");
     // save the picture as a file
-    saveFrame("output/urbanum####.png");
-    mode = 0;
-    
+    lastMorphFile = "output/urbanum"+frameCount+".png";
+    saveFrame(lastMorphFile);
+    mode = 3;
+    startTime = millis();
   }
   else
   {
@@ -218,4 +237,10 @@ String[] listFileNames(String dir) {
 PImage loadRandom(String dir, String[] files)
 {
   return loadImage("img/"+dir+"/"+files[int(random(files.length))]);
+}
+
+void calculateLocations()
+{
+	int faceX = int(width/2.0-faceSize/2.0);
+	int faceY = int(height/4.0-faceSize/2.0);
 }
