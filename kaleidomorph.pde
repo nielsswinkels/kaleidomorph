@@ -42,7 +42,7 @@ PImage imgHat;
 PImage imgMouth;
 PImage faceMask;
 
-String lastMorphFile = "";
+int lastMorphNr = 0;
 
 void setup() {
   size(640, 480);
@@ -64,6 +64,9 @@ void setup() {
   mouthFiles = listFileNames(sketchPath+"/img/mouth");
   
   faceMask = loadImage(sketchPath+"/img/facemask.png");
+  
+  lastMorphNr = listFileNames(sketchPath+"/output").length-1;
+  println("lastMorphNr="+lastMorphNr);
   
   video.start();
 }
@@ -138,7 +141,7 @@ void draw() {
   {
     if(millis() - startTime < SHOW_MORPH_DELAY)
     {
-      image(loadImage(lastMorphFile), 0, 0, width, height);
+      image(loadImage("output/urbanum"+lastMorphNr+".png"), 0, 0, width, height);
     }
     else
     {
@@ -180,8 +183,8 @@ void displayFace()
   {
     println("Saving picture");
     // save the picture as a file
-    lastMorphFile = "output/urbanum"+frameCount+".png";
-    saveFrame(lastMorphFile);
+    lastMorphNr++;
+    saveFrame("output/urbanum"+lastMorphNr+".png");
     mode = 3;
     startTime = millis();
   }
