@@ -169,7 +169,7 @@ void displayFace()
     int seconds = round((APPROVE_DELAY - (millis() - startTime))/1000);
     //println("Saving picture in " + seconds + " seconds");
     textSize(18);
-    text("Sparar bilden i " + seconds + " sekunder.", 10, 30);
+    text("Sparar bilden om " + seconds + " sekunder.", 10, 30);
   }
 }
 
