@@ -2,6 +2,8 @@ import gab.opencv.*;
 import java.awt.*;
 import processing.video.*;
 
+boolean debug = true;
+
 OpenCV opencv;
 Capture video;
 Rectangle[] faces;
@@ -100,103 +102,90 @@ void draw() {
   // draw a green recangle on all detected faces
   //rectangleAroundFaces();
 
-  if(faces.length > 0)
-  {
-    // at least one face detected
-    if (mode == 0)
-    {
-      startTime = millis();
-      mode = 1;
-      println("mode="+mode);
-    }
-  }
-  else
+  if(faces.length == 0)
   {
     // no faces detected
-    //startTime = millis();
-   mode = 0;
-   println("mode="+mode);
-  }
-  
-  if(mode == 1 && millis() - startTime > START_DELAY)
-  {
-    mode = 2;
+    mode = 0;
     println("mode="+mode);
-    
-    startTime = millis();
-    
-    imgNose = loadRandom("nose", noseFiles);
-    imgHat = loadRandom("hat", hatFiles);
-    imgEar = loadRandom("ear", earFiles);
-    imgMouth = loadRandom("mouth", mouthFiles);
   }
-  
-  if(mode == 2)
+  else  // at least one face detected, let's do something
   {
-    displayFace();
-  }
-  
-  if(mode == 3)
-  {
-    if(millis() - startTime < SHOW_MORPH_DELAY)
+    switch(mode)
     {
-      image(loadImage("output/urbanum"+lastMorphNr+".png"), 0, 0, width, height);
+      case 0:  // found at least one face
+        startTime = millis();
+        mode = 1;
+        if(debug) println("mode="+mode);
+        break;
+      case 1:  // wait untill start delay has passed 
+        if(millis() - startTime > START_DELAY)
+        {
+          mode = 2;
+          println("mode="+mode);
+          
+          startTime = millis();
+          
+          imgNose = loadRandom("nose", noseFiles);
+          imgHat = loadRandom("hat", hatFiles);
+          imgEar = loadRandom("ear", earFiles);
+          imgMouth = loadRandom("mouth", mouthFiles);
+        }
+        break;
+      case 2:  // display the generated morph
+        Rectangle f =  faces[faces.length-1];
+        PGraphics pic = createGraphics(f.width,f.height);
+        pic.beginDraw();
+        pic.image(video, -f.x, -f.y);
+        pic.endDraw();
+        //pic = loadImage(video.read());
+        
+        image(pic, faceX,faceY, faceSize,faceSize);
+        image(faceMask, faceX,faceY, faceSize,faceSize);
+        
+        int buildingsX = int(faceX - (faceSize/2.094240837696335));
+        int buildingsY = int(faceY - (faceSize/2.083333333333333));
+        int buildingsWidth = int(faceSize * 1.955);
+        int buildingsHeight = int(faceSize * 1.6525);
+        
+        
+        image(imgNose, buildingsX, buildingsY, buildingsWidth, buildingsHeight);
+        image(imgHat, buildingsX, buildingsY, buildingsWidth, buildingsHeight);
+        image(imgEar, buildingsX, buildingsY, buildingsWidth, buildingsHeight);
+        image(imgMouth, buildingsX, buildingsY, buildingsWidth, buildingsHeight);
+        
+        if (millis() - startTime > APPROVE_DELAY)
+        {
+          println("Saving picture");
+          // save the picture as a file
+          lastMorphNr++;
+          saveFrame("output/urbanum"+lastMorphNr+".png");
+          mode = 3;
+          startTime = millis();
+        }
+        else
+        {
+          int seconds = round((APPROVE_DELAY - (millis() - startTime))/1000);
+          //println("Saving picture in " + seconds + " seconds");
+          textSize(18);
+          text("Sparar bilden om " + seconds + " sekunder.", 10, 30);
+        }
+        break;
+      case 3: // display the saved image for a while and go back to idle mode
+        if(millis() - startTime < SHOW_MORPH_DELAY)
+        {
+          image(loadImage("output/urbanum"+lastMorphNr+".png"), 0, 0, width, height);
+        }
+        else
+        {
+          mode = 0;
+        }
+        break;
     }
-    else
-    {
-      mode = 0;
-    }
-	
   }
 
-  
-  
   prevAmountFaces = faces.length;
   //println("framerate:"+frameRate);
 }
-
-void displayFace()
-{
-  Rectangle f =  faces[faces.length-1];
-  PGraphics pic = createGraphics(f.width,f.height);
-  pic.beginDraw();
-  pic.image(video, -f.x, -f.y);
-  pic.endDraw();
-  //pic = loadImage(video.read());
-  
-  image(pic, faceX,faceY, faceSize,faceSize);
-  image(faceMask, faceX,faceY, faceSize,faceSize);
-  
-  int buildingsX = int(faceX - (faceSize/2.094240837696335));
-  int buildingsY = int(faceY - (faceSize/2.083333333333333));
-  int buildingsWidth = int(faceSize * 1.955);
-  int buildingsHeight = int(faceSize * 1.6525);
-  
-  
-  image(imgNose, buildingsX, buildingsY, buildingsWidth, buildingsHeight);
-  image(imgHat, buildingsX, buildingsY, buildingsWidth, buildingsHeight);
-  image(imgEar, buildingsX, buildingsY, buildingsWidth, buildingsHeight);
-  image(imgMouth, buildingsX, buildingsY, buildingsWidth, buildingsHeight);
-  
-  if (millis() - startTime > APPROVE_DELAY)
-  {
-    println("Saving picture");
-    // save the picture as a file
-    lastMorphNr++;
-    saveFrame("output/urbanum"+lastMorphNr+".png");
-    mode = 3;
-    startTime = millis();
-  }
-  else
-  {
-    int seconds = round((APPROVE_DELAY - (millis() - startTime))/1000);
-    //println("Saving picture in " + seconds + " seconds");
-    textSize(18);
-    text("Sparar bilden om " + seconds + " sekunder.", 10, 30);
-  }
-}
-
-
 
 void rectangleAroundFaces()
 {
