@@ -20,7 +20,8 @@ int faceSize = 600;
 int faceX = 0;
 int faceY = 0;
 
-String[] hejString = {"Du är staden.", "Staden är du.", "Kom hit och bli en del av Göteborg!"};
+String[] hejStrings = {"Du är staden.", "Staden är du.", "Kom hit och bli en del av Göteborg!"};
+String currentHejString = hejStrings[0];
 
 // just some supported resolutions for the logitech webcam c930e:
 // 640x360
@@ -100,12 +101,16 @@ void draw() {
   {
     fill(0);
     textSize(52);
+    
+    if(frameCount%20==0)
+      currentHejString = hejStrings[int(random(hejStrings.length))];
+    text(currentHejString, random(width/4.0, width/2.0), random(height/5.0, height/2.0));
     //pause();
   }
   
   
   // show the camera image
-  image(videoResized,0,0, video.width, video.height);
+  //image(videoResized,0,0, video.width, video.height);
   faces = opencv.detect();
   
   // draw a green recangle on all detected faces
