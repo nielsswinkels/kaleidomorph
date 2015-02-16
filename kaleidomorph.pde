@@ -100,7 +100,6 @@ void draw() {
   {
     fill(0);
     textSize(52);
-    text(hejString[int(random(hejString.length-1))], random(width/4.0, width/2.0), random(height/5.0, height/2.0));
     //pause();
   }
   
