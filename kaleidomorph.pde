@@ -20,7 +20,7 @@ int faceSize = 600;
 int faceX = 0;
 int faceY = 0;
 
-String[] hejString = {"Titta hit!", "Kolla här..", "Tjenare!", "Vem där?"};
+String[] hejString = {"Du är staden.", "Staden är du.", "Kom hit och bli en del av Göteborg!"};
 
 // just some supported resolutions for the logitech webcam c930e:
 // 640x360
@@ -31,10 +31,10 @@ String[] hejString = {"Titta hit!", "Kolla här..", "Tjenare!", "Vem där?"};
 // 1600x896
 // 1920x1080
 // 2304x1536 (max res)
-int VIDEO_RES_WIDTH = 960; // max = 2304x1536 (logitech 1080p)
-int VIDEO_RES_HEIGHT = 540;
+int VIDEO_RES_WIDTH = 1280; // max = 2304x1536 (logitech 1080p)
+int VIDEO_RES_HEIGHT = 720;
 
-float openCVScale = 0.1;
+float openCVScale = 0.3;
 
 String[] noseFiles;
 String[] earFiles;
@@ -88,7 +88,11 @@ void draw() {
   
   
   PImage videoResized = new PImage(video.width, video.height);
+  video.loadPixels();
+  videoResized.loadPixels();
   videoResized.pixels = video.pixels;
+  videoResized.updatePixels();
+  videoResized.resize(opencv.width, opencv.height);
   opencv.loadImage(videoResized);
   
   
@@ -102,16 +106,16 @@ void draw() {
   
   
   // show the camera image
-  //image(video,0,0);
+  image(videoResized,0,0, video.width, video.height);
   faces = opencv.detect();
   
   // draw a green recangle on all detected faces
   rectangleAroundFaces();
   
-  //println(faces.length);
+  println(faces.length);
   //if (true) return;
 
-  if(true ||faces.length == 0)
+  if(faces.length == 0)
   {
     // no faces detected
     mode = 0;
@@ -142,9 +146,9 @@ void draw() {
         break;
       case 2:  // display the generated morph
         Rectangle f =  faces[faces.length-1];
-        PGraphics pic = createGraphics(int(f.width*openCVScale),int(f.height*openCVScale));
+        PGraphics pic = createGraphics(int(f.width/openCVScale),int(f.height/openCVScale));
         pic.beginDraw();
-        pic.image(video, -f.x*openCVScale, -f.y*openCVScale);
+        pic.image(video, -f.x/openCVScale, -f.y/openCVScale);
         pic.endDraw();
         //pic = loadImage(video.read());
         
