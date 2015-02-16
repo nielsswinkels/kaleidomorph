@@ -156,6 +156,7 @@ void draw() {
         pic.endDraw();
         
         PImage faceImgage = pic.get();
+        faceImage.resize(faceSize,faceSize);
         faceMask.resize(faceImgage.width, faceImgage.height);
         faceImgage.mask(faceMask);
         image(faceImgage, faceX,faceY, faceSize,faceSize);
