@@ -69,7 +69,7 @@ void setup() {
   hatFiles = listFileNames(sketchPath+"/img/hat");
   mouthFiles = listFileNames(sketchPath+"/img/mouth");
   
-  faceMask = loadImage(sketchPath+"/img/facemask.png");
+  faceMask = loadImage(sketchPath+"/img/facemask_black.jpg");
   
   lastMorphNr = listFileNames(sketchPath+"/output").length-1;
   println("lastMorphNr="+lastMorphNr);
@@ -154,10 +154,11 @@ void draw() {
         pic.beginDraw();
         pic.image(video, -f.x/openCVScale, -f.y/openCVScale);
         pic.endDraw();
-        //pic = loadImage(video.read());
         
-        image(pic, faceX,faceY, faceSize,faceSize);
-        image(faceMask, faceX,faceY, faceSize,faceSize);
+        PImage faceImgage = pic.get();
+        faceMask.resize(faceImgage.width, faceImgage.height);
+        faceImgage.mask(faceMask);
+        image(faceImgage, faceX,faceY, faceSize,faceSize);
         
         int buildingsX = int(faceX - (faceSize/2.094240837696335));
         int buildingsY = int(faceY - (faceSize/2.083333333333333));
