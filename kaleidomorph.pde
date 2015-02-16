@@ -6,6 +6,7 @@ boolean debug = true;
 
 OpenCV opencv;
 Capture video;
+PImage videoResized;
 Rectangle[] faces;
 
 int START_DELAY = 0; // delay before creating a new morph
@@ -33,6 +34,8 @@ String[] hejString = {"Titta hit!", "Kolla här..", "Tjenare!", "Vem där?"};
 int VIDEO_RES_WIDTH = 960; // max = 2304x1536 (logitech 1080p)
 int VIDEO_RES_HEIGHT = 540;
 
+float openCVScale = 0.1;
+
 String[] noseFiles;
 String[] earFiles;
 String[] hatFiles;
@@ -51,8 +54,8 @@ void setup() {
   frame.setResizable(true);
   //size(1024, 768);
   video = new Capture(this, VIDEO_RES_WIDTH, VIDEO_RES_HEIGHT);
-  opencv = new OpenCV(this, VIDEO_RES_WIDTH, VIDEO_RES_HEIGHT);
-  opencv.loadCascade(OpenCV.CASCADE_FRONTALFACE);  
+  opencv = new OpenCV(this, int(VIDEO_RES_WIDTH*openCVScale), int(VIDEO_RES_HEIGHT*openCVScale));
+  opencv.loadCascade(OpenCV.CASCADE_FRONTALFACE);
   
  
   startTime = millis();
@@ -83,26 +86,32 @@ void draw() {
   // fill the screen with white
   background(255);
   
-  opencv.loadImage(video);
+  
+  PImage videoResized = new PImage(video.width, video.height);
+  videoResized.pixels = video.pixels;
+  opencv.loadImage(videoResized);
+  
+  
   if (mode == 0)
   {
     fill(0);
     textSize(52);
     text(hejString[int(random(hejString.length-1))], random(width/4.0, width/2.0), random(height/5.0, height/2.0));
-    pause();
+    //pause();
   }
   
   
   // show the camera image
   //image(video,0,0);
-  
-  
   faces = opencv.detect();
   
   // draw a green recangle on all detected faces
-  //rectangleAroundFaces();
+  rectangleAroundFaces();
+  
+  //println(faces.length);
+  //if (true) return;
 
-  if(faces.length == 0)
+  if(true ||faces.length == 0)
   {
     // no faces detected
     mode = 0;
@@ -133,9 +142,9 @@ void draw() {
         break;
       case 2:  // display the generated morph
         Rectangle f =  faces[faces.length-1];
-        PGraphics pic = createGraphics(f.width,f.height);
+        PGraphics pic = createGraphics(int(f.width*openCVScale),int(f.height*openCVScale));
         pic.beginDraw();
-        pic.image(video, -f.x, -f.y);
+        pic.image(video, -f.x*openCVScale, -f.y*openCVScale);
         pic.endDraw();
         //pic = loadImage(video.read());
         
@@ -184,7 +193,7 @@ void draw() {
   }
 
   prevAmountFaces = faces.length;
-  //println("framerate:"+frameRate);
+  println("framerate:"+frameRate);
 }
 
 void rectangleAroundFaces()
@@ -193,7 +202,7 @@ void rectangleAroundFaces()
   stroke(0, 255, 0);
   strokeWeight(3);
   for (int i = 0; i < faces.length; i++) {
-    rect(faces[i].x, faces[i].y, faces[i].width, faces[i].height);
+    rect(faces[i].x/openCVScale, faces[i].y/openCVScale, faces[i].width/openCVScale, faces[i].height/openCVScale);
   }
 }
 
