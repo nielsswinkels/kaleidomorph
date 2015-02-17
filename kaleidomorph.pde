@@ -10,8 +10,8 @@ PImage videoResized;
 Rectangle[] faces;
 
 int START_DELAY = 0; // delay before creating a new morph
-int APPROVE_DELAY = 10000; // delay before the picture is saved
-int SHOW_MORPH_DELAY = 1000; // how long to display the final saved morph
+int APPROVE_DELAY = 30000; // delay before the picture is saved
+int SHOW_MORPH_DELAY = 2000; // how long to display the final saved morph
 int startTime;
 int mode = 0; // 0 = idle, 1 = face found, 2 = saving picture, 3 = display the saved picture for a while
 
@@ -32,10 +32,10 @@ String currentHejString = hejStrings[0];
 // 1600x896
 // 1920x1080
 // 2304x1536 (max res)
-int VIDEO_RES_WIDTH = 1280; // max = 2304x1536 (logitech 1080p)
-int VIDEO_RES_HEIGHT = 720;
+int VIDEO_RES_WIDTH = 2304; // max = 2304x1536 (logitech 1080p)
+int VIDEO_RES_HEIGHT = 1536;
 
-float openCVScale = 0.3;
+float openCVScale = 0.1;
 
 String[] noseFiles;
 String[] earFiles;
@@ -82,7 +82,7 @@ int prevAmountFaces = 0;
 
 void draw() {
   int faceX = int(width/2.0-faceSize/2.0);
-  int faceY = int(height/4.0-faceSize/2.0);
+  int faceY = int(height/4.0-faceSize/2.0)+100;
   
   // fill the screen with white
   background(255);
@@ -149,29 +149,50 @@ void draw() {
         }
         break;
       case 2:  // display the generated morph
-        Rectangle f =  faces[faces.length-1];
+        Rectangle f =  faces[0];
         PGraphics pic = createGraphics(int(f.width/openCVScale),int(f.height/openCVScale));
         pic.beginDraw();
         pic.image(video, -f.x/openCVScale, -f.y/openCVScale);
         pic.endDraw();
         
-        PImage faceImgage = pic.get();
+        PImage faceImage = pic.get();
         faceImage.resize(faceSize,faceSize);
-        faceMask.resize(faceImgage.width, faceImgage.height);
-        faceImgage.mask(faceMask);
-        image(faceImgage, faceX,faceY, faceSize,faceSize);
+        faceMask.resize(faceImage.width, faceImage.height);
+        faceImage.mask(faceMask);
+        image(faceImage, faceX,faceY, faceSize,faceSize);
+        
+        // if at least 3 faces are found
+        if(faces.length > 2)
+        {
+          Rectangle f2 = faces[1];
+          Rectangle f3 = faces[2];
+          PImage face2 = cutOutRectangle(video, f2, openCVScale);
+          PImage face3 = cutOutRectangle(video, f3, openCVScale);
+          
+          PImage eye2 = cutOutEye(face2);
+          PImage eye3 = cutOutEye(face3);
+          
+          if(eye2 != null)
+            image(eye2, faceX-100+faceSize/2.0, faceY+faceSize/3.0, eye2.width, eye2.height);
+          if(eye3 != null)
+            image(eye3, faceX+100+faceSize/2.0, faceY+faceSize/3.0, eye3.width, eye3.height);
+        }
+        else if (faces.length > 1) // if 2 faces are found
+        {
+          
+        }
         
         int buildingsX = int(faceX - (faceSize/2.094240837696335));
         int buildingsY = int(faceY - (faceSize/2.083333333333333));
         int buildingsWidth = int(faceSize * 1.955);
         int buildingsHeight = int(faceSize * 1.6525);
         
-        
+        /*
         image(imgNose, buildingsX, buildingsY, buildingsWidth, buildingsHeight);
         image(imgHat, buildingsX, buildingsY, buildingsWidth, buildingsHeight);
         image(imgEar, buildingsX, buildingsY, buildingsWidth, buildingsHeight);
         image(imgMouth, buildingsX, buildingsY, buildingsWidth, buildingsHeight);
-        
+        */
         if (millis() - startTime > APPROVE_DELAY)
         {
           println("Saving picture");
@@ -203,7 +224,16 @@ void draw() {
   }
 
   prevAmountFaces = faces.length;
-  println("framerate:"+frameRate);
+  //println("framerate:"+frameRate);
+}
+
+PImage cutOutRectangle(PImage source, Rectangle rect, float scale)
+{
+  PGraphics pic = createGraphics(int(rect.width/scale),int(rect.height/scale));
+  pic.beginDraw();
+  pic.image(source, -rect.x/scale, -rect.y/scale);
+  pic.endDraw();
+  return pic.get();
 }
 
 void rectangleAroundFaces()
@@ -213,6 +243,19 @@ void rectangleAroundFaces()
   strokeWeight(3);
   for (int i = 0; i < faces.length; i++) {
     rect(faces[i].x/openCVScale, faces[i].y/openCVScale, faces[i].width/openCVScale, faces[i].height/openCVScale);
+  }
+}
+
+void rectangleAround(Rectangle[] objects, int threshold)
+{
+  noFill();
+  stroke(255, 0, 0);
+  strokeWeight(3);
+  for (int i = 0; i < objects.length; i++) {
+    stroke(255, 0, 0);
+    if(objects[i].y > threshold)
+      stroke(0, 0, 255);
+    rect(objects[i].x, objects[i].y, objects[i].width, objects[i].height);
   }
 }
 
@@ -249,3 +292,28 @@ PImage loadRandom(String dir, String[] files)
   return loadImage("img/"+dir+"/"+files[int(random(files.length))]);
 }
 
+PImage cutOutEye(PImage face)
+{
+  OpenCV opencv2 = new OpenCV(this, face.width, face.height); // FIXME does this new create heap problems?
+  opencv2.loadCascade(OpenCV.CASCADE_EYE);
+  
+  opencv2.loadImage(face);
+  Rectangle[] eyes2 = opencv2.detect();
+  
+  Rectangle eye2 = null;
+  for (int i = 0; i < eyes2.length; i++)
+  {
+    if(eyes2[i].y < face.height/2.0)
+    {
+      eye2 = eyes2[i];
+      break;
+    }
+  }
+  image(face,0,0);
+  rectangleAround(eyes2, int(face.height/2.0));
+  if(eye2 != null)
+  {
+    return cutOutRectangle(face, eye2, 1.0);
+  }
+  return null;
+}
