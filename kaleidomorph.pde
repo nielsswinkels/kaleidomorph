@@ -22,6 +22,8 @@ int faceY = 0;
 
 String[] hejStrings = {"Du är staden.", "Staden är du.", "Kom hit och bli en del av Göteborg!"};
 String currentHejString = hejStrings[0];
+int hejStringX = 0;
+int hejStringY = 0;
 
 // just some supported resolutions for the logitech webcam c930e:
 // 640x360
@@ -103,8 +105,15 @@ void draw() {
     textSize(52);
     
     if(frameCount%20==0)
+    {
       currentHejString = hejStrings[int(random(hejStrings.length))];
-    text(currentHejString, random(width/4.0, width/2.0), random(height/5.0, height/2.0));
+      hejStringX = int(random(width/6.0, width/3.0));
+      hejStringY = int(height/4.0);
+    }
+    
+    text(currentHejString, hejStringX, hejStringY);
+    hejStringX += 5;
+    
     //pause();
   }
   
