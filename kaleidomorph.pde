@@ -74,7 +74,7 @@ void setup() {
   faceMask = loadImage(sketchPath+"/img/facemask_black.jpg");
   
   lastMorphNr = listFileNames(sketchPath+"/output").length-1;
-  println("lastMorphNr="+lastMorphNr);
+  if(debug) println("lastMorphNr="+lastMorphNr);
   
   video.start();
 }
@@ -125,14 +125,14 @@ void draw() {
   // draw a green recangle on all detected faces
   rectangleAroundFaces();
   
-  println(faces.length);
+  if(debug) println(faces.length + " faces found");
   //if (true) return;
 
   if(faces.length == 0)
   {
     // no faces detected
     mode = 0;
-    println("mode="+mode);
+    if(debug) println("mode="+mode);
   }
   else  // at least one face detected, let's do something
   {
@@ -147,7 +147,7 @@ void draw() {
         if(millis() - startTime > START_DELAY)
         {
           mode = 2;
-          println("mode="+mode);
+          if(debug) println("mode="+mode);
           
           startTime = millis();
           
@@ -218,7 +218,7 @@ void draw() {
         
         if (millis() - startTime > APPROVE_DELAY)
         {
-          println("Saving picture");
+          if(debug) println("Saving picture");
           // save the picture as a file
           lastMorphNr++;
           //saveFrame("output/urbanum"+lastMorphNr+".png");
@@ -229,7 +229,6 @@ void draw() {
         else
         {
           int seconds = round((APPROVE_DELAY - (millis() - startTime))/1000);
-          //println("Saving picture in " + seconds + " seconds");
           textSize(18);
           text("Sparar bilden om " + seconds + " sekunder.", 10, 30);
         }
@@ -252,7 +251,7 @@ void draw() {
   }
 
   prevAmountFaces = faces.length;
-  //println("framerate:"+frameRate);
+  //if(debug) println("framerate:"+frameRate);
 }
 
 PImage cutOutRectangle(PImage source, Rectangle rect, float scale)
@@ -302,11 +301,11 @@ void pause()
 
 
 String[] listFileNames(String dir) {
-  println("reading filenames in dir " + dir);
+  if(debug) println("reading filenames in dir " + dir);
   File file = new File(dir);
   if (file.isDirectory()) {
     String names[] = file.list();
-    println("found "+names.length+" files");
+    if(debug) println("found "+names.length+" files");
     return names;
   } else {
     // If it's not a directory
