@@ -10,8 +10,8 @@ PImage videoResized;
 Rectangle[] faces;
 
 int START_DELAY = 0; // delay before creating a new morph
-int APPROVE_DELAY = 30000; // delay before the picture is saved
-int SHOW_MORPH_DELAY = 2000; // how long to display the final saved morph
+int APPROVE_DELAY = 10 *1000; // delay before the picture is saved
+int SHOW_MORPH_DELAY = 3 *1000; // how long to display the final saved morph
 int startTime;
 int mode = 0; // 0 = idle, 1 = face found, 2 = saving picture, 3 = display the saved picture for a while
 
@@ -205,14 +205,15 @@ void draw() {
         saveMorph.image(imgMouth, 0, 0, buildingsWidth, buildingsHeight);
         
         saveMorph.endDraw();
-        saveMorph.save("test.png");
+        
         
         if (millis() - startTime > APPROVE_DELAY)
         {
           println("Saving picture");
           // save the picture as a file
           lastMorphNr++;
-          saveFrame("output/urbanum"+lastMorphNr+".png");
+          //saveFrame("output/urbanum"+lastMorphNr+".png");
+          saveMorph.save("output/urbanum"+lastMorphNr+".png");
           mode = 3;
           startTime = millis();
         }
@@ -225,9 +226,13 @@ void draw() {
         }
         break;
       case 3: // display the saved image for a while and go back to idle mode
+        background(0);
         if(millis() - startTime < SHOW_MORPH_DELAY)
         {
-          image(loadImage("output/urbanum"+lastMorphNr+".png"), 0, 0, width, height);
+          PImage morph = loadImage("output/urbanum"+lastMorphNr+".png");
+          int morphX = int(width/2.0-morph.width/2.0);
+          int morphY = int(height/4.0-morph.height/2.0)+100;
+          image(morph, morphX, morphY, morph.width, morph.height);
         }
         else
         {
