@@ -149,6 +149,10 @@ void draw() {
         }
         break;
       case 2:  // display the generated morph
+      
+        PGraphics saveMorph = createGraphics(int(faceSize * 1.955), int(faceSize * 1.6525));
+        saveMorph.beginDraw();
+        
         Rectangle f =  faces[0];
         PGraphics pic = createGraphics(int(f.width/openCVScale),int(f.height/openCVScale));
         pic.beginDraw();
@@ -160,6 +164,8 @@ void draw() {
         faceMask.resize(faceImage.width, faceImage.height);
         faceImage.mask(faceMask);
         image(faceImage, faceX,faceY, faceSize,faceSize);
+        saveMorph.image(faceImage, (faceSize/2.094240837696335), (faceSize/2.083333333333333), faceSize,faceSize);
+        
         
         // if at least 3 faces are found
         if(faces.length > 2)
@@ -187,12 +193,20 @@ void draw() {
         int buildingsWidth = int(faceSize * 1.955);
         int buildingsHeight = int(faceSize * 1.6525);
         
-        /*
+        
         image(imgNose, buildingsX, buildingsY, buildingsWidth, buildingsHeight);
         image(imgHat, buildingsX, buildingsY, buildingsWidth, buildingsHeight);
         image(imgEar, buildingsX, buildingsY, buildingsWidth, buildingsHeight);
         image(imgMouth, buildingsX, buildingsY, buildingsWidth, buildingsHeight);
-        */
+        
+        saveMorph.image(imgNose, 0, 0, buildingsWidth, buildingsHeight);
+        saveMorph.image(imgHat, 0, 0, buildingsWidth, buildingsHeight);
+        saveMorph.image(imgEar, 0, 0, buildingsWidth, buildingsHeight);
+        saveMorph.image(imgMouth, 0, 0, buildingsWidth, buildingsHeight);
+        
+        saveMorph.endDraw();
+        saveMorph.save("test.png");
+        
         if (millis() - startTime > APPROVE_DELAY)
         {
           println("Saving picture");
