@@ -48,6 +48,7 @@ sk-IMG_774756.jpg			gothia tower
 sk-PICT767676.jpg			universeum
 sk-IMG_128478.jpg			watertower
 sk-IMG_406386.jpg			ruddalen
+sk-IMG_173953.jpg			ruddalen
 sk-IMG_551199.jpg			älvsborgs kyrkan
 sk-IMG_562152.jpg			scandinavium
 sk-IMG_800969.jpg			stenaline
@@ -55,3 +56,65 @@ sk-IMG_800969.jpg			stenaline
 
 http://media.goteborg.se/fotoweb/Grid.fwx?position=433&archiveid=5000&columns=4&rows=2&sorting=ModifiedTimeAsc&search=%28IPTC025%20contains%28Geografisk%20plats%29%29
 
+
+sk-IMG_176217.jpg			fiskekyrkan
+sk-IMG_176126.jpg			fiskekyrkan
+sk-Fiskekyrkan14.jpg			fiskekyrkan
+sk-3Residenset41.jpg			nice building
+sk-PICT035773.jpg			ulevi ball
+sk-IMG_169964.jpg			opera
+sk-IMG_249193.jpg			metal face statue
+sk-IMG_245225.jpg			kambrium konstverk
+sk-PICT000711.jpg			gun statue
+sk-Sommarbilder 04058.jpg		Karl IX statue
+sk-masthugg38.jpg			sjömanshustru
+sk-_SVE241135.jpg			nice building
+sk-IMG_432111.jpg			lejontrappan
+sk-Gustav Adolfs torg 247.jpg		lejontrappan
+sk-vitt i Gbg 0395.jpg			lejontrappan
+sk-PICT739133.jpg			Gustav adolf
+sk-Kopparmarra 232.jpg			Karl IX
+sk-o332.jpg				frölunda konstverk
+sk-staty-majorna68.jpg			majorna statue
+sk-staty432.jpg				konstverk påskägg
+sk-staty59.jpg				charles felix statue
+sk-PICT045186.jpg			walrus konstverk
+sk-krona-hjallbo86.jpg			krona
+sk-DSCN130869.jpg			x konstverk
+sk-Domkyrkan487.jpg			brunn domkyrkan
+sk-IMG_145279.jpg			domkyrkan
+sk-Lilla-torget95.jpg			lilla torget
+sk-Lilla Torget14.jpg			lilla torget
+sk-Landala_egna_hem123.jpg		landala hus
+sk-hustak595.jpg			hus med tak
+sk-hus-katrinelund23.jpg		stora katrinelund
+sk-IMG_864593.jpg			vapen
+sk-Goteborgsvapen86.jpg			vapen
+sk-Goteborgs_vapen95.jpg		vapen
+sk-fasad841.jpg				red house
+sk-fasad668.jpg				stigberget
+sk-fasad2-rohsska23.jpg			röhsska
+sk-entré214.jpg				gustaf adolfs
+sk-DSCN296977.jpg			judiska synagogan
+sk-DSCN285715.jpg			sociala huset
+sk-DSCN261078.jpg			brunnsparken
+sk-DSCN240378.jpg			tredje långgatan
+sk-DSCN228324.jpg			gegerfeltska huset
+sk-DSCN226578.jpg			nordhemsskolan
+sk-DSCN222796.jpg			sjöbefeltsskolan
+sk-DSCN221251.jpg			gustaf adolfs torg
+sk-DSCN217578.jpg			gullbergsbrohemmet
+sk-DSCN213178.jpg			packhusplatsen
+sk-DSCN212115.jpg			sahlgrenska huset
+sk-014.jpg				stuga
+sk-DSCN296883.jpg			bastionsplatsen
+sk-IMG_174744.jpg			frölanda
+sk-IMG_158367.jpg			hamn hus
+sk-IMG_064681.jpg			älvsborgsbron
+sk-Drommarnas kaj_211.jpg		gasklockan
+sk-IMG_437067.jpg			paddan
+sk-IMG_431629.jpg			arkaden
+sk-IMG_425263.jpg			hamnkran
+sk-IMG_906462.jpg			skansen kronan
+sk-IMG_737041.jpg			GU library
+sk-IMG_724732.jpg			stenaline

@@ -9,7 +9,7 @@ Capture video;
 PImage videoResized;
 Rectangle[] faces;
 
-int START_DELAY = 0; // delay before creating a new morph
+int START_DELAY = 3*1000; // delay before creating a new morph
 int APPROVE_DELAY = 10 *1000; // delay before the picture is saved
 int SHOW_MORPH_DELAY = 3 *1000; // how long to display the final saved morph
 int startTime;
@@ -50,6 +50,8 @@ PImage imgHat;
 PImage imgMouth;
 PImage faceMask;
 
+PImage imgDesk;
+
 int lastMorphNr = 0;
 
 void setup() {
@@ -72,6 +74,7 @@ void setup() {
   mouthFiles = listFileNames(sketchPath+"/img/mouth");
   
   faceMask = loadImage(sketchPath+"/img/facemask_black.jpg");
+  imgDesk = loadImage(sketchPath+"/img/desk.jpg");
   
   lastMorphNr = listFileNames(sketchPath+"/output").length-1;
   if(debug) println("lastMorphNr="+lastMorphNr);
@@ -101,7 +104,8 @@ void draw() {
   
   if (mode == 0)
   {
-    fill(0);
+    image(imgDesk, 0, 0, (height/(1.0*imgDesk.height))*imgDesk.width,height);
+    fill(255);
     textSize(52);
     
     if(frameCount%20==0)
@@ -123,7 +127,7 @@ void draw() {
   faces = opencv.detect();
   
   // draw a green recangle on all detected faces
-  rectangleAroundFaces();
+  //rectangleAroundFaces();
   
   if(debug) println(faces.length + " faces found");
   //if (true) return;
@@ -143,7 +147,17 @@ void draw() {
         mode = 1;
         if(debug) println("mode="+mode);
         break;
-      case 1:  // wait untill start delay has passed 
+      case 1:  // wait untill start delay has passed
+        PImage imgDeskFade = imgDesk;
+        int[] mask = new int[imgDesk.width * imgDesk.height];
+        int maskValue = max(255-int((millis() - startTime)/(1.0*START_DELAY)*255),0); // fadeout the desk image
+        for (int i = 0; i < mask.length; i++) {
+          mask[i] = maskValue;
+        }
+        println("mask"+mask[0]);
+        imgDeskFade.mask(mask);
+        image(imgDeskFade, 0, 0, (height/(1.0*imgDesk.height))*imgDesk.width,height);
+        
         if(millis() - startTime > START_DELAY)
         {
           mode = 2;
