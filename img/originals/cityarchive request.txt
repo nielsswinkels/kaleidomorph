@@ -118,3 +118,7 @@ sk-IMG_425263.jpg			hamnkran
 sk-IMG_906462.jpg			skansen kronan
 sk-IMG_737041.jpg			GU library
 sk-IMG_724732.jpg			stenaline
+
+
+http://media.goteborg.se/fotoweb/Grid.fwx?position=829&archiveid=5000&columns=4&rows=9&sorting=ModifiedTimeAsc&search=%28IPTC025%20contains%28Geografisk%20plats%29%29
+sk-IMG_905898.jpg			 Oskar Fredriks kyra
