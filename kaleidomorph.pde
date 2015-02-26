@@ -9,7 +9,7 @@ Capture video;
 PImage videoResized;
 Rectangle[] faces;
 
-int START_DELAY = 3*1000; // delay before creating a new morph
+int START_DELAY = 0*1000; // delay before creating a new morph
 int APPROVE_DELAY = 10 *1000; // delay before the picture is saved
 int SHOW_MORPH_DELAY = 3 *1000; // how long to display the final saved morph
 int startTime;
@@ -43,12 +43,14 @@ String[] noseFiles;
 String[] earFiles;
 String[] hatFiles;
 String[] mouthFiles;
+String[] idleFiles;
 
 PImage imgNose;
 PImage imgEar;
 PImage imgHat;
 PImage imgMouth;
 PImage faceMask;
+PImage imgIdle;
 
 PImage imgDesk;
 
@@ -72,6 +74,9 @@ void setup() {
   earFiles = listFileNames(sketchPath+"/img/ear");
   hatFiles = listFileNames(sketchPath+"/img/hat");
   mouthFiles = listFileNames(sketchPath+"/img/mouth");
+  idleFiles = listFileNames(sketchPath+"/img/idle");
+  
+  imgIdle = loadRandom("idle", idleFiles);
   
   faceMask = loadImage(sketchPath+"/img/facemask_black.jpg");
   imgDesk = loadImage(sketchPath+"/img/desk.jpg");
@@ -104,7 +109,7 @@ void draw() {
   
   if (mode == 0)
   {
-    image(imgDesk, 0, 0, (height/(1.0*imgDesk.height))*imgDesk.width,height);
+    image(imgIdle, width/2.0-((height/(1.0*imgIdle.height))*imgIdle.width/2.0), 0, (height/(1.0*imgIdle.height))*imgIdle.width,height);
     fill(255);
     textSize(52);
     
@@ -115,7 +120,7 @@ void draw() {
       hejStringY = int(height/4.0);
     }
     
-    text(currentHejString, hejStringX, hejStringY);
+    //text(currentHejString, hejStringX, hejStringY);
     hejStringX += 5;
     
     //pause();
@@ -123,7 +128,7 @@ void draw() {
   
   
   // show the camera image
-  //image(videoResized,0,0, video.width, video.height);
+  //image(video,0,0, video.width, video.height);
   faces = opencv.detect();
   
   // draw a green recangle on all detected faces
@@ -135,6 +140,13 @@ void draw() {
   if(faces.length == 0)
   {
     // no faces detected
+    
+    if(mode != 0) // we just switched back to mode 0
+    {
+      println("new idle image");
+      imgIdle = loadRandom("idle", idleFiles); // new idle image
+    }
+    
     mode = 0;
     if(debug) println("mode="+mode);
   }
@@ -156,7 +168,7 @@ void draw() {
         }
         println("mask"+mask[0]);
         imgDeskFade.mask(mask);
-        image(imgDeskFade, 0, 0, (height/(1.0*imgDesk.height))*imgDesk.width,height);
+        //image(imgDeskFade, 0, 0, (height/(1.0*imgDesk.height))*imgDesk.width,height);
         
         if(millis() - startTime > START_DELAY)
         {
