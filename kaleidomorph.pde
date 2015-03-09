@@ -68,7 +68,7 @@ void setup() {
   startTime = millis();
   mode = 0;
   
-  textFont(createFont("Georgia", 36));
+  textFont(createFont("Whitney", 36));
   
   noseFiles = listFileNames(sketchPath+"/img/nose");
   earFiles = listFileNames(sketchPath+"/img/ear");
@@ -255,6 +255,7 @@ void draw() {
         else
         {
           int seconds = round((APPROVE_DELAY - (millis() - startTime))/1000);
+          fill(0);
           textSize(18);
           text("Sparar bilden om " + seconds + " sekunder.", 10, 30);
         }
