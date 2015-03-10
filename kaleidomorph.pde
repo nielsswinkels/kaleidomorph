@@ -5,7 +5,7 @@ import java.util.Comparator;
 import java.util.Arrays;
 import java.io.File;
 
-boolean debug = true;
+boolean debug = false;
 
 OpenCV opencv;
 Capture video;
@@ -32,6 +32,10 @@ int buildingsX = int(screenWidth / 2.0) + marginH;
 int buildingsY = marginV;
 int buildingsWidth = int(screenWidth/2.0-(marginH*2.0));
 int buildingsHeight = int(screenHeight-(marginV*2.0));
+int progressCircleWidth = 100;
+int progessCircleHeight = 100;
+int progressCircleX = buildingsX + buildingsWidth - progressCircleWidth -20;
+int progressCircleY = buildingsY + buildingsHeight - progessCircleHeight -20;
 int galleryX = marginH;
 int galleryY = marginV;
 int galleryWidth = buildingsWidth;
@@ -77,7 +81,8 @@ String[] morphFiles;
 int prevNrFiles = 0;
 Comparator<File> byModificationDate = new ModificationDateCompare();
 int galleryCounter = 0;
-PImage galleryImg;
+PImage[] galleryImgs;
+int galleryMode = 16;
 
 void setup() {
   size(screenWidth, screenHeight);
@@ -107,6 +112,8 @@ void setup() {
   lastMorphNr = listFileNames(morphDir).length-1;
   if(debug) println("lastMorphNr="+lastMorphNr);
   
+  galleryImgs = new PImage[galleryMode];
+  
   video.start();
 }
 
@@ -115,11 +122,11 @@ int prevAmountFaces = 0;
 
 void draw() {
   // fill the screen with white
-  background(255);
+  background(227, 240, 125);
   
   if(debug) // draw margins for debug
   {
-    fill(200);
+    fill(36,78,75);
     noStroke();
     rect(0, 0, screenWidth, marginV);
     rect(0, screenHeight-marginV, screenWidth, marginV);
@@ -150,7 +157,6 @@ void draw() {
   if (mode == 0)
   {
     // display an image in idle mode
-    println("new width:"+resizeWidth(imgIdle.width, imgIdle.height, buildingsHeight));
     image(imgIdle, buildingsX, buildingsY, resizeWidth(imgIdle.width, imgIdle.height, buildingsHeight), buildingsHeight);
     fill(255);
     textSize(52);
@@ -185,7 +191,7 @@ void draw() {
     
     if(mode != 0) // we just switched back to mode 0
     {
-      println("new idle image");
+      if(debug) println("new idle image");
       imgIdle = loadRandom("idle", idleFiles); // new idle image
     }
     
@@ -295,6 +301,14 @@ void draw() {
           fill(0);
           textSize(18);
           text("Sparar bilden om " + seconds + " sekunder.", 10, 30);
+          //noFill();
+          fill(214,123,53);
+          stroke(36,78,75);
+          strokeWeight(10);
+          arc(progressCircleX, progressCircleY, progressCircleWidth, progessCircleHeight, PI/-2.0, PI/-2.0 + 2*PI*((APPROVE_DELAY-seconds*1000)/(APPROVE_DELAY*1.0)));
+          fill(36,78,75);
+          textSize(32);
+          text(seconds, progressCircleX-10, progressCircleY+10);
         }
         break;
       case 3: // display the saved image for a while and go back to idle mode
@@ -365,7 +379,7 @@ void pause()
 
 
 String[] listFileNames(String dir) {
-  if(debug) println("reading filenames in dir " + dir);
+  //if(debug) println("reading filenames in dir " + dir);
   File file = new File(dir);
   if (file.isDirectory()) {
     File[] files = file.listFiles();
@@ -375,7 +389,7 @@ String[] listFileNames(String dir) {
     {
       names[i] = files[i].getName();
     }
-    if(debug) println("found "+names.length+" files");
+    //if(debug) println("found "+names.length+" files");
     return names;
   } else {
     // If it's not a directory
@@ -431,16 +445,56 @@ void displayGallery()
     return;
   }
   
-  if(galleryImg == null || galleryCounter%100 == 0 || prevNrFiles < morphFiles.length)
+  if(galleryImgs[galleryImgs.length-1] == null)
   {
-    galleryCounter = 0;
-    galleryImg = loadImage(morphDir + "/" + morphFiles[int(random(morphFiles.length))]);
-    if(prevNrFiles < morphFiles.length)
+    // load new images
+    if(morphFiles.length < galleryImgs.length)
     {
-      galleryImg = loadImage(morphDir + "/" + morphFiles[morphFiles.length-1]);
+      println("Warning: There are less images available("+morphFiles.length+") that what will be displayed in the gallery("+galleryImgs.length+"), so you will see some more than once.");
+    }
+    for(int i = 0; i<galleryImgs.length;i++)
+    {
+      galleryImgs[i] = loadImage(morphDir + "/" + morphFiles[int(random(morphFiles.length))]);
     }
   }
-  image(galleryImg, galleryX, galleryY, galleryWidth, galleryHeight);
+  
+  if(galleryCounter%10 == 0 || prevNrFiles < morphFiles.length)
+  {
+    galleryCounter = 0;
+    
+    // move all images one step in the array
+    for(int i = galleryImgs.length-1; i > 0; i--)
+    {
+      galleryImgs[i] = galleryImgs[i-1];
+    }
+    // new image on index 0
+    galleryImgs[0] = loadImage(morphDir + "/" + morphFiles[int(random(morphFiles.length))]);
+    
+    if(prevNrFiles < morphFiles.length)
+    { // if a new image appeared, load that one
+      galleryImgs[0] = loadImage(morphDir + "/" + morphFiles[morphFiles.length-1]);
+    }
+  }
+  switch(galleryMode)
+  {
+    case 1:
+      image(galleryImgs[0], galleryX, galleryY, galleryWidth, galleryHeight);
+      break;
+    case 4:
+    case 16:
+      int imgIndex = 0;
+      float sqroot = sqrt(galleryMode);
+      for(int i = 0; i<sqroot;i++)
+      {
+        for(int j = 0; j<sqroot;j++)
+        {
+          image(galleryImgs[imgIndex], galleryX+j*galleryWidth/sqroot, galleryY+i*galleryHeight/sqroot, galleryWidth/sqroot, galleryHeight/sqroot);
+          imgIndex++;
+        }
+      }
+      break;
+  }
+  
   prevNrFiles = morphFiles.length;
   galleryCounter++;
 }
