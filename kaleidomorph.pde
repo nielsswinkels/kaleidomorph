@@ -16,9 +16,21 @@ int startTime;
 int mode = 0; // 0 = idle, 1 = face found, 2 = saving picture, 3 = display the saved picture for a while
 
 // parameters for the location of the morphed face
-int faceSize = 600;
-int faceX = 0;
-int faceY = 0;
+int screenWidth = 1920;
+int screenHeight = 1080;
+int marginH = 54;
+int marginV = 54;
+int faceSize = 627;
+int faceXRelative = 106; // how much to move the face relative to the buildingsX
+int faceYRelative = 172;
+int faceX = int(screenWidth / 2.0) + marginH + faceXRelative;
+int faceY = marginV + faceYRelative;
+int buildingsX = int(screenWidth / 2.0) + marginH;
+int buildingsY = marginV;
+int buildingsWidth = int(screenWidth/2.0-(marginH*2.0));
+int buildingsHeight = int(screenHeight-(marginV*2.0));
+int galleryX = marginH;
+int galleryY = marginV;
 
 String[] hejStrings = {"Du är staden.", "Staden är du.", "Kom hit och bli en del av Göteborg!"};
 String currentHejString = hejStrings[0];
@@ -57,9 +69,8 @@ PImage imgDesk;
 int lastMorphNr = 0;
 
 void setup() {
-  size(640, 480);
+  size(screenWidth, screenHeight);
   frame.setResizable(true);
-  //size(1024, 768);
   video = new Capture(this, VIDEO_RES_WIDTH, VIDEO_RES_HEIGHT);
   opencv = new OpenCV(this, int(VIDEO_RES_WIDTH*openCVScale), int(VIDEO_RES_HEIGHT*openCVScale));
   opencv.loadCascade(OpenCV.CASCADE_FRONTALFACE);
@@ -91,11 +102,24 @@ int prevAmountFaces = 0;
 
 
 void draw() {
-  int faceX = int(width/2.0-faceSize/2.0);
-  int faceY = int(height/4.0-faceSize/2.0)+100;
+  //int faceX = int(width/2.0-faceSize/2.0);
+  //int faceY = int(height/4.0-faceSize/2.0)+100;
   
   // fill the screen with white
   background(255);
+  
+  if(true)
+  {
+    fill(200);
+    noStroke();
+    rect(0, 0, screenWidth, marginV);
+    rect(0, screenHeight-marginV, screenWidth, marginV);
+    
+    rect(0, 0, marginH, screenHeight);
+    rect(screenWidth-marginH, 0, marginH, screenHeight);
+    
+    rect(screenWidth/2.0-marginH, 0, marginH*2.0, screenHeight);
+  }
   
   
   PImage videoResized = new PImage(video.width, video.height);
@@ -185,7 +209,7 @@ void draw() {
         break;
       case 2:  // display the generated morph
       
-        PGraphics saveMorph = createGraphics(int(faceSize * 1.955), int(faceSize * 1.6525));
+        PGraphics saveMorph = createGraphics(buildingsWidth, buildingsHeight); // create an image to save the morph as a file with transparency
         saveMorph.beginDraw();
         
         Rectangle f =  faces[0];
@@ -194,12 +218,12 @@ void draw() {
         pic.image(video, -f.x/openCVScale, -f.y/openCVScale);
         pic.endDraw();
         
-        PImage faceImage = pic.get();
-        faceImage.resize(faceSize,faceSize);
+        PImage faceImage = pic.get(); // get the face as an image from the video stream
+        faceImage.resize(faceSize,faceSize); // make it always the same square size
         faceMask.resize(faceImage.width, faceImage.height);
-        faceImage.mask(faceMask);
+        faceImage.mask(faceMask); // apply mask to cut out the face shape
         image(faceImage, faceX,faceY, faceSize,faceSize);
-        saveMorph.image(faceImage, (faceSize/2.094240837696335), (faceSize/2.083333333333333), faceSize,faceSize);
+        saveMorph.image(faceImage, faceXRelative, faceYRelative, faceSize,faceSize);
         
         
         // if at least 3 faces are found
@@ -222,11 +246,6 @@ void draw() {
         {
           
         }
-        
-        int buildingsX = int(faceX - (faceSize/2.094240837696335));
-        int buildingsY = int(faceY - (faceSize/2.083333333333333));
-        int buildingsWidth = int(faceSize * 1.955);
-        int buildingsHeight = int(faceSize * 1.6525);
         
         
         image(imgNose, buildingsX, buildingsY, buildingsWidth, buildingsHeight);
