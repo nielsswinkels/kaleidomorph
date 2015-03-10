@@ -1,6 +1,9 @@
 import gab.opencv.*;
 import java.awt.*;
 import processing.video.*;
+import java.util.Comparator;
+import java.util.Arrays;
+import java.io.File;
 
 boolean debug = true;
 
@@ -31,6 +34,8 @@ int buildingsWidth = int(screenWidth/2.0-(marginH*2.0));
 int buildingsHeight = int(screenHeight-(marginV*2.0));
 int galleryX = marginH;
 int galleryY = marginV;
+int galleryWidth = buildingsWidth;
+int galleryHeight = buildingsHeight;
 
 String[] hejStrings = {"Du är staden.", "Staden är du.", "Kom hit och bli en del av Göteborg!"};
 String currentHejString = hejStrings[0];
@@ -67,6 +72,12 @@ PImage imgIdle;
 PImage imgDesk;
 
 int lastMorphNr = 0;
+String morphDir;
+String[] morphFiles;
+int prevNrFiles = 0;
+Comparator<File> byModificationDate = new ModificationDateCompare();
+int galleryCounter = 0;
+PImage galleryImg;
 
 void setup() {
   size(screenWidth, screenHeight);
@@ -92,7 +103,8 @@ void setup() {
   faceMask = loadImage(sketchPath+"/img/facemask_black.jpg");
   imgDesk = loadImage(sketchPath+"/img/desk.jpg");
   
-  lastMorphNr = listFileNames(sketchPath+"/output").length-1;
+  morphDir = sketchPath+"/output";
+  lastMorphNr = listFileNames(morphDir).length-1;
   if(debug) println("lastMorphNr="+lastMorphNr);
   
   video.start();
@@ -102,13 +114,10 @@ int prevAmountFaces = 0;
 
 
 void draw() {
-  //int faceX = int(width/2.0-faceSize/2.0);
-  //int faceY = int(height/4.0-faceSize/2.0)+100;
-  
   // fill the screen with white
   background(255);
   
-  if(true)
+  if(debug) // draw margins for debug
   {
     fill(200);
     noStroke();
@@ -120,6 +129,13 @@ void draw() {
     
     rect(screenWidth/2.0-marginH, 0, marginH*2.0, screenHeight);
   }
+  
+  //*********
+  // gallery
+  
+  displayGallery();
+  
+  //***************
   
   
   PImage videoResized = new PImage(video.width, video.height);
@@ -133,7 +149,9 @@ void draw() {
   
   if (mode == 0)
   {
-    image(imgIdle, width/2.0-((height/(1.0*imgIdle.height))*imgIdle.width/2.0), 0, (height/(1.0*imgIdle.height))*imgIdle.width,height);
+    // display an image in idle mode
+    println("new width:"+resizeWidth(imgIdle.width, imgIdle.height, buildingsHeight));
+    image(imgIdle, buildingsX, buildingsY, resizeWidth(imgIdle.width, imgIdle.height, buildingsHeight), buildingsHeight);
     fill(255);
     textSize(52);
     
@@ -350,13 +368,25 @@ String[] listFileNames(String dir) {
   if(debug) println("reading filenames in dir " + dir);
   File file = new File(dir);
   if (file.isDirectory()) {
-    String names[] = file.list();
+    File[] files = file.listFiles();
+    Arrays.sort(files, byModificationDate);
+    String[] names = new String[files.length];
+    for(int i = 0; i < files.length;i++)
+    {
+      names[i] = files[i].getName();
+    }
     if(debug) println("found "+names.length+" files");
     return names;
   } else {
     // If it's not a directory
     println("Warning: this is not a directory:"+dir);
     return null;
+  }
+}
+
+class ModificationDateCompare implements Comparator<File> {
+  public int compare(File f1, File f2) {
+    return Long.valueOf(f1.lastModified()).compareTo(f2.lastModified());    
   }
 }
 
@@ -389,4 +419,38 @@ PImage cutOutEye(PImage face)
     return cutOutRectangle(face, eye2, 1.0);
   }
   return null;
+}
+
+void displayGallery()
+{
+  morphFiles = listFileNames(morphDir);
+  if(morphFiles == null ||morphFiles.length <= 0)
+  {
+    fill(0);
+    println("Error: no images found in dir "+morphDir+" to display in the gallery.");
+    return;
+  }
+  
+  if(galleryImg == null || galleryCounter%100 == 0 || prevNrFiles < morphFiles.length)
+  {
+    galleryCounter = 0;
+    galleryImg = loadImage(morphDir + "/" + morphFiles[int(random(morphFiles.length))]);
+    if(prevNrFiles < morphFiles.length)
+    {
+      galleryImg = loadImage(morphDir + "/" + morphFiles[morphFiles.length-1]);
+    }
+  }
+  image(galleryImg, galleryX, galleryY, galleryWidth, galleryHeight);
+  prevNrFiles = morphFiles.length;
+  galleryCounter++;
+}
+
+int resizeWidth(int originalWidth, int originalHeight, int newHeight)
+{
+  return int((newHeight/(1.0*originalHeight))*originalWidth);
+}
+
+int resizeHeight(int originalWidth, int originalHeight, int newWidth)
+{
+  return int((newWidth/(1.0*originalWidth))*originalHeight);
 }
