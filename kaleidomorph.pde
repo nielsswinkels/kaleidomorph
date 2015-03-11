@@ -13,8 +13,9 @@ PImage videoResized;
 Rectangle[] faces;
 
 int START_DELAY = 0*1000; // delay before creating a new morph
-int APPROVE_DELAY = 10 *1000; // delay before the picture is saved
-int SHOW_MORPH_DELAY = 3 *1000; // how long to display the final saved morph
+int APPROVE_DELAY = 5 *1000; // delay before the picture is saved
+int SHOW_MORPH_DELAY = 2 *1000; // how long to display the final saved morph
+int FLASH_DELAY = int(1 * 1000); // how long to flash a white background
 int startTime;
 int mode = 0; // 0 = idle, 1 = face found, 2 = saving picture, 3 = display the saved picture for a while
 
@@ -124,18 +125,15 @@ void draw() {
   // fill the screen with white
   background(227, 240, 125);
   
-  if(true) // draw margins for debug
-  {
-    fill(36,78,75);
-    noStroke();
-    rect(0, 0, screenWidth, marginV);
-    rect(0, screenHeight-marginV, screenWidth, marginV);
-    
-    rect(0, 0, marginH, screenHeight);
-    rect(screenWidth-marginH, 0, marginH, screenHeight);
-    
-    rect(screenWidth/2.0-marginH, 0, marginH*2.0, screenHeight);
-  }
+  // draw margins for debug
+  fill(36,78,75);
+  noStroke();
+  rect(0, 0, screenWidth, marginV);
+  rect(0, screenHeight-marginV, screenWidth, marginV);
+  rect(0, 0, marginH, screenHeight);
+  rect(screenWidth-marginH, 0, marginH, screenHeight);
+  rect(screenWidth/2.0-marginH, 0, marginH*2.0, screenHeight);
+  
   
   //*********
   // gallery
@@ -313,13 +311,19 @@ void draw() {
         }
         break;
       case 3: // display the saved image for a while and go back to idle mode
-        background(0);
+        //background(0);
         if(millis() - startTime < SHOW_MORPH_DELAY)
         {
           PImage morph = loadImage("output/urbanum"+lastMorphNr+".png");
           int morphX = int(width/2.0-morph.width/2.0);
           int morphY = int(height/4.0-morph.height/2.0)+100;
-          image(morph, morphX, morphY, morph.width, morph.height);
+          //image(morph, morphX, morphY, morph.width, morph.height);
+          if(millis() - startTime < FLASH_DELAY)
+          {
+            fill(255);
+            rect(buildingsX, buildingsY, buildingsWidth, buildingsHeight);
+          }
+          image(morph, buildingsX, buildingsY, buildingsWidth, buildingsHeight);
         }
         else
         {
