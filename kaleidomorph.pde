@@ -82,7 +82,7 @@ int prevNrFiles = 0;
 Comparator<File> byModificationDate = new ModificationDateCompare();
 int galleryCounter = 0;
 PImage[] galleryImgs;
-int galleryMode = 16;
+int galleryMode = 4;
 
 void setup() {
   size(screenWidth, screenHeight);
@@ -124,7 +124,7 @@ void draw() {
   // fill the screen with white
   background(227, 240, 125);
   
-  if(debug) // draw margins for debug
+  if(true) // draw margins for debug
   {
     fill(36,78,75);
     noStroke();
@@ -309,6 +309,7 @@ void draw() {
           fill(36,78,75);
           textSize(32);
           text(seconds, progressCircleX-10, progressCircleY+10);
+          text("Sparar din bild om", progressCircleX-80, progressCircleY-30);
         }
         break;
       case 3: // display the saved image for a while and go back to idle mode
@@ -330,6 +331,7 @@ void draw() {
 
   prevAmountFaces = faces.length;
   //if(debug) println("framerate:"+frameRate);
+  println("framerate:"+frameRate);
 }
 
 PImage cutOutRectangle(PImage source, Rectangle rect, float scale)
@@ -458,7 +460,7 @@ void displayGallery()
     }
   }
   
-  if(galleryCounter%10 == 0 || prevNrFiles < morphFiles.length)
+  if(galleryCounter%100 == 0 || prevNrFiles < morphFiles.length)
   {
     galleryCounter = 0;
     
