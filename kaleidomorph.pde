@@ -155,21 +155,8 @@ void draw() {
   if (mode == 0)
   {
     // display an image in idle mode
-    image(imgIdle, buildingsX, buildingsY, resizeWidth(imgIdle.width, imgIdle.height, buildingsHeight), buildingsHeight);
-    fill(255);
-    textSize(52);
-    
-    if(frameCount%20==0)
-    {
-      currentHejString = hejStrings[int(random(hejStrings.length))];
-      hejStringX = int(random(width/6.0, width/3.0));
-      hejStringY = int(height/4.0);
-    }
-    
-    //text(currentHejString, hejStringX, hejStringY);
-    hejStringX += 5;
-    
-    //pause();
+    int idleWidth = resizeWidth(imgIdle.width, imgIdle.height, buildingsHeight);
+    image(imgIdle, buildingsX + (buildingsWidth - idleWidth)/2.0, buildingsY, idleWidth, buildingsHeight);
   }
   
   
