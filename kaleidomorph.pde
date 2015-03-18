@@ -405,12 +405,25 @@ String[] listFileNames(String dir) {
     File[] files = file.listFiles();
     Arrays.sort(files, byModificationDate);
     String[] names = new String[files.length];
+    int j = 0;
     for(int i = 0; i < files.length;i++)
     {
-      names[i] = files[i].getName();
+      // skip directories and mac hidden files
+      if(files[i].isDirectory() == false && files[i].getName().substring(0,1).equals(".") == false)
+      {
+        names[j] = files[i].getName();
+        j++;
+      }
     }
+    
+    String[] names2 = new String[j];
+    for(int i = 0; i < names2.length;i++)
+    {
+      names2[i] = names[i];
+    }
+    
     //if(debug) println("found "+names.length+" files");
-    return names;
+    return names2;
   } else {
     // If it's not a directory
     println("Warning: this is not a directory:"+dir);
