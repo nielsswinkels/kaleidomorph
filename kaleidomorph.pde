@@ -90,7 +90,7 @@ PImage imgIdle;
 
 PImage imgDesk;
 
-int lastMorphNr = 0;
+String lastMorphNr = "";
 String morphDir;
 String[] morphFiles;
 int prevNrFiles = 0;
@@ -126,7 +126,7 @@ void setup() {
   imgDesk = loadImage(sketchPath+"/img/desk.jpg");
   
   morphDir = sketchPath+"/output";
-  lastMorphNr = listFileNames(morphDir).length-1;
+  //lastMorphNr = listFileNames(morphDir).length-1;
   if(debug) println("lastMorphNr="+lastMorphNr);
   
   galleryImgs = new PImage[galleryMode];
@@ -301,10 +301,14 @@ void draw() {
         {
           if(debug) println("Saving picture");
           // save the picture as a file
-          lastMorphNr++;
+          lastMorphNr = ""+year() + month() + day() + hour() + minute() + second();
+          println("lastMorphNr="+lastMorphNr);
           //saveFrame("output/urbanum"+lastMorphNr+".png");
           saveMorph.save("output/urbanum"+lastMorphNr+".png");
           newMorphAvailable = true;
+          
+          deleteOldestFiles();
+          
           mode = 3;
           startTime = millis();
         }
@@ -351,7 +355,7 @@ void draw() {
 
   prevAmountFaces = faces.length;
   //if(debug) println("framerate:"+frameRate);
-  println("framerate:"+frameRate);
+  //println("framerate:"+frameRate);
 }
 
 PImage cutOutRectangle(PImage source, Rectangle rect, float scale)
@@ -551,4 +555,26 @@ int resizeWidth(int originalWidth, int originalHeight, int newHeight)
 int resizeHeight(int originalWidth, int originalHeight, int newWidth)
 {
   return int((newWidth/(1.0*originalWidth))*originalHeight);
+}
+
+void deleteOldestFiles()
+{
+  morphFiles = listFileNames(morphDir);
+  while(morphFiles.length > 30)
+  {
+    boolean success = false; 
+    try{
+      success = (new File(morphDir +"/"+  morphFiles[0])).delete();
+    }
+    catch(NullPointerException e)
+    {
+      println("NullPointerException: Could not find the file that I wanted to delete.");
+    }
+    if(debug) println("Tried to remove file "+morphDir+" "+morphFiles[0]+ " and success="+success);
+    if(!success)
+    {
+      println("Warning! Could not remove file: "+morphDir+"/"+morphFiles[0]+" So I'll stop trying now. This means you might end up with a lot of files after a long time.");
+    }
+    morphFiles = listFileNames(morphDir);
+  }
 }
