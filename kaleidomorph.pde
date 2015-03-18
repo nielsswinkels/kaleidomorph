@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.io.File;
 
 boolean debug = false;
+boolean showVideo = false;
 
 OpenCV opencv;
 Capture video;
@@ -13,7 +14,8 @@ PImage videoResized;
 Rectangle[] faces;
 
 int START_DELAY = 0*1000; // delay before creating a new morph
-int APPROVE_DELAY = 5 *1000; // delay before the picture is saved
+int BUILDINGS_DELAY = 4*1000; // delay before buildings are added to the face
+int APPROVE_DELAY = 10 *1000; // delay before the picture is saved
 int SHOW_MORPH_DELAY = 2 *1000; // how long to display the final saved morph
 int FLASH_DELAY = int(1 * 1000); // how long to flash a white background
 int startTime;
@@ -24,19 +26,31 @@ int screenWidth = 1920;
 int screenHeight = 1080;
 int marginH = 54;
 int marginV = 54;
+int morphFrameX = int(screenWidth / 2.0) + marginH;
+int morphFrameY = marginV;
 int faceSize = 627;
 int faceXRelative = 106; // how much to move the face relative to the buildingsX
 int faceYRelative = 172;
-int faceX = int(screenWidth / 2.0) + marginH + faceXRelative;
-int faceY = marginV + faceYRelative;
-int buildingsX = int(screenWidth / 2.0) + marginH;
-int buildingsY = marginV;
+int faceX = morphFrameX + faceXRelative;
+int faceY = morphFrameY + faceYRelative;
+int eyeLeftXRelative = 214;
+int eyeLeftYRelative = 353;
+int eyeRightXRelative = 481;
+int eyeRightYRelative = 353;
+int eyeLeftX = morphFrameX + eyeLeftXRelative;
+int eyeLeftY = morphFrameY + eyeLeftYRelative;
+int eyeRightX =  morphFrameX + eyeRightXRelative;
+int eyeRightY =  morphFrameY + eyeRightYRelative;
+int eyeWidth = 150;
+int eyeHeight = 150;
+int buildingsX = morphFrameX;
+int buildingsY = morphFrameY;
 int buildingsWidth = int(screenWidth/2.0-(marginH*2.0));
 int buildingsHeight = int(screenHeight-(marginV*2.0));
-int progressCircleWidth = 100;
-int progessCircleHeight = 100;
-int progressCircleX = buildingsX + buildingsWidth - progressCircleWidth -20;
-int progressCircleY = buildingsY + buildingsHeight - progessCircleHeight -20;
+int progressCircleWidth = 200;
+int progessCircleHeight = 200;
+int progressCircleX = morphFrameX + buildingsWidth - progressCircleWidth +50;
+int progressCircleY = morphFrameY + buildingsHeight - progessCircleHeight +90;
 int galleryX = marginH;
 int galleryY = marginV;
 int galleryWidth = buildingsWidth;
@@ -56,10 +70,10 @@ int hejStringY = 0;
 // 1600x896
 // 1920x1080
 // 2304x1536 (max res)
-int VIDEO_RES_WIDTH = 2304; // max = 2304x1536 (logitech 1080p)
-int VIDEO_RES_HEIGHT = 1536;
+int VIDEO_RES_WIDTH = 1920; // max = 2304x1536 (logitech 1080p)
+int VIDEO_RES_HEIGHT = 1080;
 
-float openCVScale = 0.1;
+float openCVScale = 0.2;
 
 String[] noseFiles;
 String[] earFiles;
@@ -92,6 +106,7 @@ void setup() {
   opencv = new OpenCV(this, int(VIDEO_RES_WIDTH*openCVScale), int(VIDEO_RES_HEIGHT*openCVScale));
   opencv.loadCascade(OpenCV.CASCADE_FRONTALFACE);
   
+  println("opencv started with scale:"+openCVScale+" width:"+opencv.width+" height:"+opencv.height);
  
   startTime = millis();
   mode = 0;
@@ -156,16 +171,19 @@ void draw() {
   {
     // display an image in idle mode
     int idleWidth = resizeWidth(imgIdle.width, imgIdle.height, buildingsHeight);
-    image(imgIdle, buildingsX + (buildingsWidth - idleWidth)/2.0, buildingsY, idleWidth, buildingsHeight);
+    //image(imgIdle, buildingsX + (buildingsWidth - idleWidth)/2.0, buildingsY, idleWidth, buildingsHeight);
+    textSize(80);
+    text("Ställ dig här", buildingsX + buildingsWidth/2.0 - 330, buildingsY  + buildingsHeight/2.0);
+    text("och titta in i kameran", buildingsX + buildingsWidth/2.0 - 330, buildingsY  + buildingsHeight/2.0 + 100);
   }
   
   
   // show the camera image
-  //image(video,0,0, video.width, video.height);
+  if(showVideo) image(video,0,0, video.width, video.height);
   faces = opencv.detect();
   
   // draw a green recangle on all detected faces
-  //rectangleAroundFaces();
+  if(showVideo) rectangleAroundFaces();
   
   if(debug) println(faces.length + " faces found");
   //if (true) return;
@@ -193,6 +211,7 @@ void draw() {
         if(debug) println("mode="+mode);
         break;
       case 1:  // wait untill start delay has passed
+        /*
         PImage imgDeskFade = imgDesk;
         int[] mask = new int[imgDesk.width * imgDesk.height];
         int maskValue = max(255-int((millis() - startTime)/(1.0*START_DELAY)*255),0); // fadeout the desk image
@@ -202,7 +221,7 @@ void draw() {
         println("mask"+mask[0]);
         imgDeskFade.mask(mask);
         //image(imgDeskFade, 0, 0, (height/(1.0*imgDesk.height))*imgDesk.width,height);
-        
+        */
         if(millis() - startTime > START_DELAY)
         {
           mode = 2;
@@ -235,38 +254,45 @@ void draw() {
         saveMorph.image(faceImage, faceXRelative, faceYRelative, faceSize,faceSize);
         
         
-        // if at least 3 faces are found
-        if(faces.length > 2)
+        // if more than 1 face is found, take the eyes
+        if(faces.length > 1)
         {
-          Rectangle f2 = faces[1];
-          Rectangle f3 = faces[2];
+          Rectangle f2 = faces[max(faces.length-2, faces.length-1, 0)];
+          Rectangle f3 = faces[faces.length-1];
           PImage face2 = cutOutRectangle(video, f2, openCVScale);
           PImage face3 = cutOutRectangle(video, f3, openCVScale);
           
           PImage eye2 = cutOutEye(face2);
-          PImage eye3 = cutOutEye(face3);
+          PImage eye3 = cutOutEye(face3, true);
           
           if(eye2 != null)
-            image(eye2, faceX-100+faceSize/2.0, faceY+faceSize/3.0, eye2.width, eye2.height);
+          {
+            image(eye2, eyeLeftX, eyeLeftY, eyeWidth, eyeHeight);
+            saveMorph.image(eye2, eyeLeftXRelative, eyeLeftYRelative, eyeWidth, eyeHeight);
+          }
           if(eye3 != null)
-            image(eye3, faceX+100+faceSize/2.0, faceY+faceSize/3.0, eye3.width, eye3.height);
+          {
+            image(eye3, eyeRightX, eyeRightY, eyeWidth, eyeHeight);
+            saveMorph.image(eye3, eyeRightXRelative, eyeRightYRelative, eyeWidth, eyeHeight);
+          }
         }
-        else if (faces.length > 1) // if 2 faces are found
+        
+        if(millis() - startTime > BUILDINGS_DELAY)
         {
+          if(millis() - startTime > BUILDINGS_DELAY + 0)
+            image(imgNose, buildingsX, buildingsY, buildingsWidth, buildingsHeight);
+          if(millis() - startTime > BUILDINGS_DELAY + 500)
+            image(imgHat, buildingsX, buildingsY, buildingsWidth, buildingsHeight);
+          if(millis() - startTime > BUILDINGS_DELAY + 1000)
+            image(imgEar, buildingsX, buildingsY, buildingsWidth, buildingsHeight);
+          if(millis() - startTime > BUILDINGS_DELAY + 1500)
+            image(imgMouth, buildingsX, buildingsY, buildingsWidth, buildingsHeight);
           
+          saveMorph.image(imgNose, 0, 0, buildingsWidth, buildingsHeight);
+          saveMorph.image(imgHat, 0, 0, buildingsWidth, buildingsHeight);
+          saveMorph.image(imgEar, 0, 0, buildingsWidth, buildingsHeight);
+          saveMorph.image(imgMouth, 0, 0, buildingsWidth, buildingsHeight);
         }
-        
-        
-        image(imgNose, buildingsX, buildingsY, buildingsWidth, buildingsHeight);
-        image(imgHat, buildingsX, buildingsY, buildingsWidth, buildingsHeight);
-        image(imgEar, buildingsX, buildingsY, buildingsWidth, buildingsHeight);
-        image(imgMouth, buildingsX, buildingsY, buildingsWidth, buildingsHeight);
-        
-        saveMorph.image(imgNose, 0, 0, buildingsWidth, buildingsHeight);
-        saveMorph.image(imgHat, 0, 0, buildingsWidth, buildingsHeight);
-        saveMorph.image(imgEar, 0, 0, buildingsWidth, buildingsHeight);
-        saveMorph.image(imgMouth, 0, 0, buildingsWidth, buildingsHeight);
-        
         saveMorph.endDraw();
         
         
@@ -285,16 +311,17 @@ void draw() {
           int seconds = round((APPROVE_DELAY - (millis() - startTime))/1000);
           fill(0);
           textSize(18);
-          text("Sparar bilden om " + seconds + " sekunder.", 10, 30);
+          //text("Sparar bilden om " + seconds + " sekunder.", 10, 30);
           //noFill();
           fill(214,123,53);
           stroke(36,78,75);
-          strokeWeight(10);
+          strokeWeight(20);
           arc(progressCircleX, progressCircleY, progressCircleWidth, progessCircleHeight, PI/-2.0, PI/-2.0 + 2*PI*((APPROVE_DELAY-seconds*1000)/(APPROVE_DELAY*1.0)));
           fill(36,78,75);
-          textSize(32);
+          textSize(80);
           text(seconds, progressCircleX-10, progressCircleY+10);
-          text("Sparar din bild om", progressCircleX-80, progressCircleY-30);
+          text("Tar bild om", progressCircleX-520, progressCircleY+0);
+          text("Photo in", progressCircleX-460, progressCircleY+80);
         }
         break;
       case 3: // display the saved image for a while and go back to idle mode
@@ -404,6 +431,11 @@ PImage loadRandom(String dir, String[] files)
 
 PImage cutOutEye(PImage face)
 {
+  return cutOutEye(face, false);
+}
+
+PImage cutOutEye(PImage face, boolean right)
+{
   OpenCV opencv2 = new OpenCV(this, face.width, face.height); // FIXME does this new create heap problems?
   opencv2.loadCascade(OpenCV.CASCADE_EYE);
   
@@ -413,14 +445,14 @@ PImage cutOutEye(PImage face)
   Rectangle eye2 = null;
   for (int i = 0; i < eyes2.length; i++)
   {
-    if(eyes2[i].y < face.height/2.0)
+    if(eyes2[i].y < face.height/2.0 && (!right || eyes2[i].x > face.width/2.0))
     {
       eye2 = eyes2[i];
       break;
     }
   }
-  image(face,0,0);
-  rectangleAround(eyes2, int(face.height/2.0));
+  //image(face,0,0);
+  //rectangleAround(eyes2, int(face.height/2.0));
   if(eye2 != null)
   {
     return cutOutRectangle(face, eye2, 1.0);
