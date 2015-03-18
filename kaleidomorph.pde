@@ -98,6 +98,7 @@ Comparator<File> byModificationDate = new ModificationDateCompare();
 int galleryCounter = 0;
 PImage[] galleryImgs;
 int galleryMode = 4;
+boolean newMorphAvailable = false;
 
 void setup() {
   size(screenWidth, screenHeight);
@@ -303,6 +304,7 @@ void draw() {
           lastMorphNr++;
           //saveFrame("output/urbanum"+lastMorphNr+".png");
           saveMorph.save("output/urbanum"+lastMorphNr+".png");
+          newMorphAvailable = true;
           mode = 3;
           startTime = millis();
         }
@@ -475,7 +477,9 @@ PImage cutOutEye(PImage face, boolean right)
 
 void displayGallery()
 {
-  morphFiles = listFileNames(morphDir);
+  if(morphFiles == null || newMorphAvailable)
+    morphFiles = listFileNames(morphDir);
+
   if(morphFiles == null ||morphFiles.length <= 0)
   {
     fill(0);
@@ -496,10 +500,8 @@ void displayGallery()
     }
   }
   
-  if(galleryCounter%100 == 0 || prevNrFiles < morphFiles.length)
+  if(galleryCounter%100 == 0 || newMorphAvailable)
   {
-    galleryCounter = 0;
-    
     // move all images one step in the array
     for(int i = galleryImgs.length-1; i > 0; i--)
     {
@@ -508,10 +510,14 @@ void displayGallery()
     // new image on index 0
     galleryImgs[0] = loadImage(morphDir + "/" + morphFiles[int(random(morphFiles.length))]);
     
-    if(prevNrFiles < morphFiles.length)
+    if(newMorphAvailable)
     { // if a new image appeared, load that one
       galleryImgs[0] = loadImage(morphDir + "/" + morphFiles[morphFiles.length-1]);
     }
+    
+    // reset to start over
+    newMorphAvailable = false;
+    galleryCounter = 0;
   }
   switch(galleryMode)
   {
