@@ -125,7 +125,7 @@ void setup() {
   faceMask = loadImage(sketchPath+"/img/facemask_black.jpg");
   imgDesk = loadImage(sketchPath+"/img/desk.jpg");
   
-  morphDir = sketchPath+"/output";
+  morphDir = sketchPath+"/morphs";
   //lastMorphNr = listFileNames(morphDir).length-1;
   if(debug) println("lastMorphNr="+lastMorphNr);
   
@@ -303,8 +303,8 @@ void draw() {
           // save the picture as a file
           lastMorphNr = ""+year() + month() + day() + hour() + minute() + second();
           println("lastMorphNr="+lastMorphNr);
-          //saveFrame("output/urbanum"+lastMorphNr+".png");
-          saveMorph.save("output/urbanum"+lastMorphNr+".png");
+          //saveFrame(morphDir+"/urbanum"+lastMorphNr+".png");
+          saveMorph.save(morphDir+"/urbanum"+lastMorphNr+".png");
           newMorphAvailable = true;
           
           deleteOldestFiles();
@@ -334,7 +334,7 @@ void draw() {
         //background(0);
         if(millis() - startTime < SHOW_MORPH_DELAY)
         {
-          PImage morph = loadImage("output/urbanum"+lastMorphNr+".png");
+          PImage morph = loadImage(morphDir+"/urbanum"+lastMorphNr+".png");
           int morphX = int(width/2.0-morph.width/2.0);
           int morphY = int(height/4.0-morph.height/2.0)+100;
           //image(morph, morphX, morphY, morph.width, morph.height);
