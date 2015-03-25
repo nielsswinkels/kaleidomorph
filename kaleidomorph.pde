@@ -172,10 +172,10 @@ void draw() {
   {
     // display an image in idle mode
     int idleWidth = resizeWidth(imgIdle.width, imgIdle.height, buildingsHeight);
-    //image(imgIdle, buildingsX + (buildingsWidth - idleWidth)/2.0, buildingsY, idleWidth, buildingsHeight);
-    textSize(80);
-    text("Ställ dig här", buildingsX + buildingsWidth/2.0 - 330, buildingsY  + buildingsHeight/2.0);
-    text("och titta in i kameran", buildingsX + buildingsWidth/2.0 - 330, buildingsY  + buildingsHeight/2.0 + 100);
+    image(imgIdle, buildingsX + (buildingsWidth - idleWidth)/2.0, buildingsY, idleWidth, buildingsHeight);
+    textSize(60);
+    text("Stanna framför skärmen", buildingsX + buildingsWidth/2.0 - 330, buildingsY + 60);
+    text("om du vill bli fotad!", buildingsX + buildingsWidth/2.0 - 330, buildingsY + 60 + 100);
   }
   
   
