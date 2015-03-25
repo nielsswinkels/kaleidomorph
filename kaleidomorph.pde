@@ -322,10 +322,10 @@ void draw() {
           fill(214,123,53);
           stroke(36,78,75);
           strokeWeight(20);
-          arc(progressCircleX, progressCircleY, progressCircleWidth, progessCircleHeight, PI/-2.0, PI/-2.0 + 2*PI*((APPROVE_DELAY-seconds*1000)/(APPROVE_DELAY*1.0)));
+          arc(progressCircleX, progressCircleY, progressCircleWidth, progessCircleHeight, PI/-2.0, PI/-2.0 + 2*PI*((millis() - startTime)/(APPROVE_DELAY*1.0)));
           fill(36,78,75);
           textSize(80);
-          text(seconds, progressCircleX-10, progressCircleY+10);
+          text(seconds, progressCircleX-10, progressCircleY+20);
           text("Tar bild om", progressCircleX-520, progressCircleY+0);
           text("Photo in", progressCircleX-460, progressCircleY+80);
         }
